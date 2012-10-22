@@ -49,6 +49,77 @@ class HitchManager
   }
 
   /**
+   * Marshall an object into an xml string
+   * 
+   * @param stdClass $object
+   * @throws Exception
+   */
+  public function marshall($object)
+  {
+
+    $metadata = $this->classMetadataFactory->getClassMetadata($object);
+    $xml = $this->marshallObject($object, $metadata);
+
+    return $xml;
+  }
+
+  protected function marshallObject($object, $metadata){
+
+    $xml = $this->marshallElements($object, $metadata); 
+          
+  }
+
+  protected function marshallElement($object, $element){
+    
+      $property = $element[0];
+      $nodeName = $element[1];
+
+      $getter = 'get' . ucfirst($property);
+      $propertyValue = $object->$getter();
+
+      $element_string .= "<" . $nodeName . " " . $this->marshallAttributes($element) .">";
+      
+      foreach($element->getLists() as $info){
+
+       if(is_object($propertyValue)){
+          $element_string .= $this->marshallElement($propertyValue, $info);
+        }else{
+          $element_string .= $propertyValue;
+        }   
+      }
+
+      foreach($element->getElements() as $info){
+
+        if(is_object($propertyValue)){
+          $element_string .= $this->marshallElement($propertyValue, $info);
+        }else{
+          $element_string .= $propertyValue;
+        }       
+      }
+
+      $element_string .= "</". $nodeName .">";
+
+    return $element_string;
+  }
+
+  protected function marshallAttributes($object, $metaData){
+    
+    foreach($metaData->getAttributes() as $name => $info){
+
+      $property = $info[0];
+      $nodeName = $info[1];
+
+      $getter = 'get' . ucfirst($property);
+      $propertyValue = $object->$getter($value);
+      
+      $attribute_string .= $name . "=" . $propertyValue . " ";
+
+    }
+
+    return $attribute_string;
+  }
+
+  /**
    * Unmarshall an XML string into an object graph
    * 
    * @param string $xmlString
@@ -208,17 +279,6 @@ class HitchManager
       $value = (string)$xml;
       $obj->$setter($value);
     }
-  }
-
-  /**
-   * Marshall an object into an xml string
-   * 
-   * @param stdClass $object
-   * @throws Exception
-   */
-  public function marshall($object)
-  {
-    throw new Exception("Not implemented yet");
   }
 
   /**
