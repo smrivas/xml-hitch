@@ -9,6 +9,9 @@
  * file that was distributed with this source code.
  */
 
+// include the demo class loader
+//include 'ClassLoader.php';
+
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Cache\ArrayCache;
 
@@ -16,31 +19,35 @@ use Hitch\HitchManager;
 use Hitch\Mapping\ClassMetadataFactory;
 use Hitch\Mapping\Loader\AnnotationLoader;
 
-// include the demo class loader
-include 'ClassLoader.php';
+// Composer autoloader
+$loader = include __DIR__ . '/../vendor/autoload.php';
+
+$loader->setUseIncludePath(true);
 
 // set path to doctrine-common lib
-$DOCTRINE_COMMON_LIB = __DIR__.'/../vendor/doctrine-common/lib';
+$VENDOR_LIB = __DIR__.'/../vendor/';
+$DOCTRINE_COMMON_LIB = $VENDOR_LIB.'doctrine/common/lib';
 
 // make sure doctrine-common exists
 if(!is_dir($DOCTRINE_COMMON_LIB)){
   die('<span style="color: red;">Make sure to download and install the doctrine-common (<a href="https://github.com/doctrine/common">https://github.com/doctrine/common</a>) library to: ' . $DOCTRINE_COMMON_LIB . ' !!!</span>');
 }
 
-// register namespaces for demo
-$loader = new ClassLoader();
-$loader->registerNamespaces(array(
-    'Hitch'           	=> __DIR__.'/../lib',	                  // main Hitch lib
-    'Hitch\\Demo'     	=> __DIR__.'/src',	                      // Hitch demo package
-    'Doctrine\\Common' 	    => $DOCTRINE_COMMON_LIB,  // Doctrine common library
-));
-
-// register the autoloading
-$loader->register();
+set_include_path(
+    '.' .
+    PATH_SEPARATOR . $VENDOR_LIB .
+    PATH_SEPARATOR . $DOCTRINE_COMMON_LIB .
+    PATH_SEPARATOR . get_include_path()
+);
 
 // create our new HitchManager
 $hitch = new HitchManager();
-$hitch->setClassMetaDataFactory(new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()), new ArrayCache()));
+$hitch->setClassMetaDataFactory(
+    new ClassMetadataFactory(
+        new AnnotationLoader(new AnnotationReader()),
+        new ArrayCache()
+    )
+);
 
 // pre-build the class meta data cache
 $hitch->registerRootClass('Hitch\\Demo\\Entity\\Catalog');

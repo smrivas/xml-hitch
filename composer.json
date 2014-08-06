@@ -1,0 +1,26 @@
+{
+    "name": "lampjunkie/xml-hitch",
+    "description": "XML Marshaller, Unmarshaller",
+    "keywords": ["xml"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Marc Roulias",
+            "email": "marc@lampjunkie.com"
+        },
+        {
+            "name": "Mike Groner"
+        }
+    ],
+    "require": {
+        "doctrine/common": "2.0.x-dev",
+        "ext-libxml": "*"
+    },
+
+    "autoload": {
+        "psr-0": {
+            "Hitch\\": ["lib", "demo/src"]
+        }
+    }
+}
+

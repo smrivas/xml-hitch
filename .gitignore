@@ -1,0 +1,9 @@
+/.project
+/nbproject
+/.settings
+/.buildpath
+/.idea
+/reports
+/vendor
+*~
+*zip
